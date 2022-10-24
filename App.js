@@ -7,7 +7,7 @@ import { StreamChat } from 'stream-chat';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { chatApiKey, chatUserId } from './chatConfig';
 import { useChatClient } from './useChatClient';
-import { Chat, OverlayProvider, ChannelList, Channel, MessageList, MessageInput, } from 'stream-chat-expo';
+import { Chat, OverlayProvider, ChannelList, Channel, MessageList, MessageInput,Thread, } from 'stream-chat-expo';
 import { AppProvider, useAppContext  } from "./AppContext";
 
 
@@ -24,11 +24,19 @@ const sort = {
 };
 
 const ChannelScreen = props => {
-  const { channel } = useAppContext();
+  const { navigation } = props;
+  const { channel, setThread } = useAppContext();
 
   return (
     <Channel channel={channel}>
-      <MessageList />
+      <MessageList
+        onThreadSelect={(message) => {
+          if (channel?.id) {
+            setThread(message);
+            navigation.navigate('ThreadScreen');
+          }
+        }}
+      />
       <MessageInput />
     </Channel>
   );
@@ -48,7 +56,16 @@ const ChannelListScreen = props => {
     />
   );
 };
+const ThreadScreen = props => {
+  const { channel, thread } = useAppContext();
 
+  return null;
+  return (
+    <Channel channel={channel} thread={message} threadList>
+      <Thread />
+    </Channel>
+  );
+}
 
 // const HomeScreen = () => <Text>Home Screen</Text>;
 
@@ -69,6 +86,7 @@ const NavigationStack = () => {
           {/* <Stack.Screen name="Home" component={HomeScreen} /> */}
           <Stack.Screen name="ChannelList" component={ChannelListScreen} />
           <Stack.Screen name="ChannelScreen" component={ChannelScreen} />
+          <Stack.Screen name="ThreadScreen" component={ThreadScreen} />
         </Stack.Navigator>
       </Chat>
     </OverlayProvider>
