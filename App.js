@@ -7,8 +7,8 @@ import { StreamChat } from 'stream-chat';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { chatApiKey, chatUserId } from './chatConfig';
 import { useChatClient } from './useChatClient';
-import { Chat, OverlayProvider, ChannelList, Channel, MessageList, MessageInput,Thread, } from 'stream-chat-expo';
-import { AppProvider, useAppContext  } from "./AppContext";
+import { Chat, OverlayProvider, ChannelList, Channel, MessageList, MessageInput, Thread, } from 'stream-chat-expo';
+import { AppProvider, useAppContext  } from "./AppContext"; //왠만하면 useAPpContext 쓰자
 
 
 const Stack = createStackNavigator();
@@ -25,16 +25,15 @@ const sort = {
 
 const ChannelScreen = props => {
   const { navigation } = props;
-  const { channel, setThread } = useAppContext();
+  const { channel,setThread, thread } = useAppContext();
+
 
   return (
-    <Channel channel={channel}>
+    <Channel channel={channel} thread={thread}>
       <MessageList
-        onThreadSelect={(message) => {
-          if (channel?.id) {
-            setThread(message);
-            navigation.navigate('ThreadScreen');
-          }
+        onThreadSelect={selectedThread => {
+          setThread(selectedThread);
+          navigation.navigate('ThreadScreen');
         }}
       />
       <MessageInput />
@@ -57,16 +56,15 @@ const ChannelListScreen = props => {
   );
 };
 const ThreadScreen = props => {
-  const { channel, thread } = useAppContext();
-
-  return null;
+  const { channel } = useAppContext();
+  const { setThread, thread } = useAppContext();
+  
   return (
-    <Channel channel={channel} thread={message} threadList>
-      <Thread />
+<Channel channel={channel} thread={thread} threadList>
+      <Thread onThreadDismount={() => setThread(undefined)} />
     </Channel>
   );
 }
-
 // const HomeScreen = () => <Text>Home Screen</Text>;
 
 
@@ -80,7 +78,7 @@ const NavigationStack = () => {
   }
 
   return (
-    <OverlayProvider>
+    <OverlayProvider> 
       <Chat client={chatClient}>
         <Stack.Navigator>
           {/* <Stack.Screen name="Home" component={HomeScreen} /> */}
